@@ -14,7 +14,8 @@ def start_monitor_mode(interface_name):
     os.system(f"sudo airmon-ng start {interface_name}")
 
 def capture_bssid(interface_name):
-    os.system(f"sudo timeout 5 airodump-ng {interface_name}mon > airodump.txt")
+    interface_name_mon = get_active_interface()
+    os.system(f"sudo timeout 5 airodump-ng {interface_name_mon} > airodump.txt")
     os.system("grep -E '([[:xdigit:]]{2}:){5}[[:xdigit:]]{2}' airodump.txt | awk '$6 ~ /^[1-9][0-9]*$/ && $11 !~ /^</ {print $1, $6, $11}' | sort | uniq > bssid.txt")
     os.system("rm airodump.txt")
     with open("bssid.txt", "r") as file:
