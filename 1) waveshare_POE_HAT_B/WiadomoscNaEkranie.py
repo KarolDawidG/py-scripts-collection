@@ -5,7 +5,7 @@ class WiadomoscNaEkranie:
     def __init__(self):
         self.display = SSD1306()
         self.display.Init()
-        self.font = ImageFont.load_default()  # Uzyj domyslnej czcionki
+        self.font = ImageFont.load_default()
 
     def wyswietl_wiadomosc(self, wiadomosc):
         image = Image.new('1', (self.display.width, self.display.height), "WHITE")

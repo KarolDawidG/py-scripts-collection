@@ -10,28 +10,18 @@ import socket
 import fcntl
 import struct
 from PIL import Image, ImageDraw, ImageFont
-from SSD1306 import SSD1306  # Zaktualizowany import
+from SSD1306 import SSD1306
 
 show = SSD1306()
 show.Init()
 dir_path = os.path.dirname(os.path.abspath(__file__))
 
-# Asumuj?c, ?e czcionka jest w tym samym folderze co skrypt
 font_path = os.path.join(dir_path, 'Courier_New.ttf')
 font = ImageFont.truetype(font_path, 13)
-
-
 
 image1 = Image.new('1', (show.width, show.height), "WHITE")
 draw = ImageDraw.Draw(image1)
 class POE_HAT_B:
-    def Display_Welcome_Message(self):
-        image = Image.new('1', (show.width, show.height), "WHITE")
-        draw = ImageDraw.Draw(image)
-        draw.text((10, 15), 'Witaj', font=font, fill=0)
-        show.ShowImage(show.getbuffer(image))
-        time.sleep(60)  # Wyswietla napis przez 60 sekund
-
     def __init__(self,address = 0x20):
         self.i2c = smbus.SMBus(1)
         self.address = address#0x20
