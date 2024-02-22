@@ -11,7 +11,13 @@ def press_to_continue():
     input("Naciśnij Enter, aby kontynuować...")
 
 def start_monitor_mode(interface_name):
+    # Uruchomienie trybu monitorowania
     os.system(f"sudo airmon-ng start {interface_name}")
+
+    # Ponowne sprawdzenie dostępnych interfejsów sieciowych, aby znaleźć aktualną nazwę interfejsu w trybie monitorowania
+    updated_interface_name = subprocess.getoutput("ip link | grep -Eo '^[0-9]+: wl[^:]+' | awk -F': ' '{print $2}' | tr -d ':'").strip()
+
+    return updated_interface_name
 
 def capture_bssid(interface_name):
     os.system(f"sudo timeout 5 airodump-ng {interface_name} > airodump.txt")
@@ -32,6 +38,8 @@ def stop_monitor_mode(interface_name):
 
 def main():
     interface_name = get_active_interface()
+    interface_name = start_monitor_mode(interface_name)
+
     while True:
         print("\n1) Przechwyc BSSID.")
         print("2) Wybierz kanał.")
