@@ -24,11 +24,24 @@ def start_monitor_mode(interface_name):
     return updated_interface_name
 
 def capture_bssid(interface_name):
-    os.system(f"sudo timeout 5 airodump-ng {interface_name} > airodump.txt")
-    os.system("grep -E '([[:xdigit:]]{2}:){5}[[:xdigit:]]{2}' airodump.txt | awk '$6 ~ /^[1-9][0-9]*$/ && $11 !~ /^</ {print $1, $6, $11}' | sort | uniq > bssid.txt")
-    os.system("rm airodump.txt")
-    with open("bssid.txt", "r") as file:
-        print(file.read())
+    # Wykonanie airodump-ng i przechwycenie wyników bezpośrednio do zmiennej
+    airodump_output = subprocess.getoutput(f"sudo timeout 5 airodump-ng {interface_name}")
+
+    # Inicjalizacja listy do przechowywania danych BSSID
+    bssid_data = []
+
+    # Przetwarzanie wyników airodump-ng, linia po linii
+    for line in airodump_output.split('\n'):
+        if re.search(r'([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}', line):
+            # Przetwarzanie linii zawierających BSSID
+            columns = line.split()
+            if len(columns) >= 14:  # Sprawdzenie, czy linia zawiera wymagane dane
+                bssid = columns[0]
+                channel = columns[5]
+                ssid = ' '.join(columns[13:])  # SSID może zawierać spacje
+                bssid_data.append([bssid, channel, ssid])
+
+    return bssid_data
 
 def set_channel(interface_name, channel):
     os.system(f"sudo iw {interface_name} set channel {channel}")
@@ -43,6 +56,7 @@ def stop_monitor_mode(interface_name):
 def main():
     interface_name = get_active_interface()
     interface_name = start_monitor_mode(interface_name)
+    bssid_data = []
 
     while True:
         print("\n1) Przechwyc BSSID.")
@@ -53,22 +67,28 @@ def main():
         choice = input("Wybierz opcję: ")
 
         if choice == "1":
-            start_monitor_mode(interface_name)
-            capture_bssid(interface_name)
+            bssid_data = capture_bssid(interface_name)  # Przechwytywanie danych do zmiennej
+            for index, (bssid, channel, ssid) in enumerate(bssid_data):
+                print(f"{index + 1}) BSSID: {bssid}, Kanał: {channel}, SSID: {ssid}")
             press_to_continue()
+
         elif choice == "2":
             channel = input("Wpisz numer kanału, na którym chcesz przeprowadzić atak deauth: ")
             set_channel(interface_name, channel)
             press_to_continue()
         elif choice == "3":
-            with open("bssid.txt", "r") as file:
-                print(file.read())
-            bssid = input("Podaj BSSID, na którym chcesz przeprowadzić atak deauth: ")
-            deauth_attack(interface_name, bssid)
-            press_to_continue()
+            if not bssid_data:  # Sprawdzenie, czy lista bssid_data jest pusta
+                print("Najpierw wykonaj przechwycenie BSSID (opcja 1).")
+            else:
+                for index, (bssid, channel, ssid) in enumerate(bssid_data):
+                    print(f"{index + 1}) BSSID: {bssid}, Kanał: {channel}, SSID: {ssid}")
+                bssid_index = int(input("Wybierz numer BSSID, na którym chcesz przeprowadzić atak deauth: ")) - 1
+                bssid = bssid_data[bssid_index][0]  # Pobranie BSSID na podstawie wyboru użytkownika
+                deauth_attack(interface_name, bssid)
+                press_to_continue()
         elif choice == "0":
             stop_monitor_mode(interface_name)
-            os.system("rm bssid.txt")
+            ## os.system("rm bssid.txt")
             print("Wyjście.")
             break
         else:
