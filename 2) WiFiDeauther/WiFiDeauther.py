@@ -12,6 +12,10 @@ def press_to_continue():
 
 def start_monitor_mode(interface_name):
     # Uruchomienie trybu monitorowania
+    os.system(f"sudo airmon-ng check kill && clear")
+    os.system("echo ==================")
+    os.system("echo -  WiFiDeauther  -")
+    os.system("echo ==================")
     os.system(f"sudo airmon-ng start {interface_name}")
 
     # Ponowne sprawdzenie dostępnych interfejsów sieciowych, aby znaleźć aktualną nazwę interfejsu w trybie monitorowania
