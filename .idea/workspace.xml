@@ -5,9 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="51d14524-6557-42f7-b61d-73eb9efabfec" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/1) waveshare_POE_HAT_B/POE_HAT_B.py" beforeDir="false" afterPath="$PROJECT_DIR$/1) waveshare_POE_HAT_B/POE_HAT_B.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/1) waveshare_POE_HAT_B/WiadomoscNaEkranie.py" beforeDir="false" afterPath="$PROJECT_DIR$/1) waveshare_POE_HAT_B/WiadomoscNaEkranie.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/1) waveshare_POE_HAT_B/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/1) waveshare_POE_HAT_B/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/2) WiFiDeauther/WiFiDeauther.py" beforeDir="false" afterPath="$PROJECT_DIR$/2) WiFiDeauther/WiFiDeauther.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,7 +45,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1708621311807</updated>
-      <workItem from="1708621313647" duration="1436000" />
+      <workItem from="1708621313647" duration="3359000" />
     </task>
     <servers />
   </component>
