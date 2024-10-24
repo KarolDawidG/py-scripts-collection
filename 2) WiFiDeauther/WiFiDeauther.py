@@ -1,6 +1,8 @@
 import os
 import subprocess
 import sys
+import signal
+import subprocess
 
 def get_active_interface():
     interface_name = subprocess.getoutput("ip link | grep -Eo '^[0-9]+: wl[^:]+' | awk -F': ' '{print $2}' | tr -d ':'")
