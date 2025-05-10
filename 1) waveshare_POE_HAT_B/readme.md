@@ -18,6 +18,13 @@ sudo apt-get install -y python3-pip python3-smbus
 sudo pip3 install RPi.GPIO
 ```
 
+### Select Interacting Options ->I2C ->yes to start the I2C kernel driver
+
+```bash
+sudo raspi-config
+```
+
+
 ### 2. Sklonuj repozytorium
 
 ```bash
